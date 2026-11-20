@@ -48,7 +48,7 @@ Every market, ranked by **volume surge** (last hour versus the hourly average), 
 
 ### Analytics
 
-<img src="docs/screenshots/analytics.png" alt="Analytics view for HYPE" width="100%">
+<img src="docs/screenshots/analytics.png" alt="Analytics view for BTC" width="100%">
 
 | Section | What it shows |
 | --- | --- |
