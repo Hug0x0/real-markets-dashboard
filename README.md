@@ -48,7 +48,7 @@ Every market, ranked by **volume surge** (last hour versus the hourly average), 
 
 ### Analytics
 
-<img src="docs/screenshots/analytics.png" alt="Analytics view for BTC" width="100%">
+<img src="docs/screenshots/analytics.png" alt="Analytics view for HYPE" width="100%">
 
 | Section | What it shows |
 | --- | --- |
@@ -117,4 +117,4 @@ VITE_REAL_API_URL=https://indexer.api.testnet.real.xyz
 
 ## Independence and license
 
-This is a community project and is **not affiliated with Real Markets**. It is read-only: no wallet, no orders, no keys. Released under the [MIT](LICENSE) license.
+This is a community project and is **not affiliated with Real Markets**. It is read-only: no wallet, no orders, no keys. Token logos are loaded from CoinGecko and belong to their respective projects. Released under the [MIT](LICENSE) license.

@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { SCREENER_METRICS, rankRows, type MarketRow, type ScreenerMetric } from "./analytics";
 import { Empty } from "./charts";
 import { count, pct, price, ratio, trendClass, usd } from "./format";
+import { logoUrl } from "./logos";
 
 type Props = { rows: MarketRow[]; onOpen: (marketId: string) => void };
 
@@ -22,6 +23,11 @@ function metricText(metric: ScreenerMetric, row: MarketRow) {
 }
 
 export function AssetBadge({ row }: { row: MarketRow }) {
+  const logo = logoUrl(row.base);
+  const [failed, setFailed] = useState<string | null>(null);
+  if (logo && failed !== logo) {
+    return <img className="asset-badge asset-logo" src={logo} alt="" aria-hidden loading="lazy" referrerPolicy="no-referrer" onError={() => setFailed(logo)} />;
+  }
   let hash = 0;
   for (const char of row.base) hash = (hash * 31 + char.charCodeAt(0)) % 360;
   return (

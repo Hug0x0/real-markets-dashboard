@@ -150,6 +150,7 @@ tbody tr:hover, tbody tr:focus-visible { background: var(--panel-2); }
 /* Analytics ticker strip */
 .ticker-strip { display: flex; align-items: center; gap: 28px; padding: 14px 24px; border-bottom: 1px solid var(--line); overflow-x: auto; }
 .ticker-id { display: flex; align-items: center; gap: 12px; padding-right: 28px; border-right: 1px solid var(--line); }
+.asset-logo { object-fit: cover; background: var(--panel-2); }
 .ticker-id .asset-badge { width: 40px; height: 40px; font-size: 13px; }
 .market-select select { min-height: 30px; border: 0; padding-left: 0; background-color: transparent; font-size: 19px; font-weight: 600; }
 .ticker-id strong { display: block; font: 500 15px var(--mono); white-space: nowrap; }
