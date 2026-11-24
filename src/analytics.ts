@@ -9,6 +9,13 @@ export function num(value: string | number | null | undefined): number {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
+/** Parses an optional indexer numeric string; missing or non-finite values become null. */
+export function optionalNum(value: string | number | null | undefined): number | null {
+  if (value === null || value === undefined || value === "") return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
 export const notional = (trade: Trade) => num(trade.price) * num(trade.volume);
 export const isTakerBuy = (trade: Trade) => /buy|bid|long/i.test(trade.side);
 export const baseSymbol = (symbol: string) => symbol.split(/[-/_]/)[0].toUpperCase();
@@ -18,14 +25,22 @@ export type MarketRow = {
   symbol: string;
   base: string;
   name: string;
+  /** Mark price. */
   price: number;
+  /** Last traded price from the ticker, falling back to the mark price. */
+  lastPrice: number;
   indexPrice: number;
   turnover24h: number;
   openInterest: number;
   fundingRate: number | null;
   fundingTimeMs: number | null;
-  /** Fractional change versus the oldest covered price (0.021 = +2.1%); null without a reference trade. */
+  /**
+   * Fractional 24h change (0.021 = +2.1%). Taken from the ticker's `price_change_24h` when present,
+   * otherwise mark price versus the oldest covered fill; null when neither is available.
+   */
   change24h: number | null;
+  /** 24h volume versus the previous 24h, from the ticker's `volume_change_24h`; null when not reported. */
+  volumeChange24h: number | null;
   tradeVolume24h: number;
   volume1h: number;
   avgHourlyVolume: number;
@@ -79,25 +94,28 @@ export function buildMarketRows(tickers: MarketTicker[], markets: Market[], trad
     }
     const avg = day / coveredHours;
     const base = baseSymbol(ticker.symbol);
+    const fallbackChange = reference && price ? price / reference - 1 : null;
     return {
       id: ticker.market_id,
       symbol: ticker.symbol,
       base,
       name: names.get(ticker.market_id) || base,
       price,
+      lastPrice: optionalNum(ticker.last_traded_price) ?? price,
       indexPrice: num(ticker.index_price),
       turnover24h: num(ticker.turnover_24h),
       openInterest: num(ticker.open_interest_value),
       fundingRate: ticker.perp_next_funding_rate == null ? null : num(ticker.perp_next_funding_rate),
       fundingTimeMs: ticker.perp_next_funding_time_ms ?? null,
-      change24h: reference && price ? price / reference - 1 : null,
+      change24h: optionalNum(ticker.price_change_24h) ?? fallbackChange,
+      volumeChange24h: optionalNum(ticker.volume_change_24h),
       tradeVolume24h: day,
       volume1h: hour,
       avgHourlyVolume: avg,
       surge: avg > 0 ? hour / avg : null,
       trades24h: count,
-      high24h: high,
-      low24h: low,
+      high24h: optionalNum(ticker.high_price_24h) ?? high,
+      low24h: optionalNum(ticker.low_price_24h) ?? low,
     };
   });
 }
@@ -280,12 +298,13 @@ export function longShortAccounts(payments: FundingPayment[]) {
   return { longs, shorts, ratio: shorts > 0 ? longs / shorts : null, asOfMs: Math.max(0, ...[...latest.values()].map((payment) => payment.updated_at_ms)) };
 }
 
-export type ScreenerMetric = "surge" | "change" | "volume" | "openInterest" | "funding" | "trades";
+export type ScreenerMetric = "surge" | "change" | "volume" | "volumeChange" | "openInterest" | "funding" | "trades";
 
 export const SCREENER_METRICS: Record<ScreenerMetric, { label: string; help: string; value: (row: MarketRow) => number | null }> = {
   surge: { label: "Volume Surge", help: "Traded notional in the last hour divided by the average hourly notional over the last 24 hours. 2.00× means this hour is twice as busy as usual.", value: (row) => row.surge },
-  change: { label: "24h Change", help: "Mark price versus the oldest trade price in the 24-hour window.", value: (row) => row.change24h },
+  change: { label: "24h Change", help: "Last traded price versus the price 24 hours ago, as reported by the indexer ticker.", value: (row) => row.change24h },
   volume: { label: "24h Volume", help: "24h USD turnover reported by the indexer ticker.", value: (row) => row.turnover24h },
+  volumeChange: { label: "Volume Δ 24h", help: "24h volume versus the previous 24 hours, as reported by the indexer ticker. +50% means half again as much volume as the day before.", value: (row) => row.volumeChange24h },
   openInterest: { label: "Open Interest", help: "Reported value of open positions (USD).", value: (row) => row.openInterest },
   funding: { label: "Funding Rate", help: "Next funding rate reported by the indexer.", value: (row) => row.fundingRate },
   trades: { label: "24h Trades", help: "Number of fills in the last 24 hours.", value: (row) => row.trades24h },

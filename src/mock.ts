@@ -84,6 +84,7 @@ export function demoDataset(now = Date.now()): Dataset {
       turnover_24h: turnover24h.toFixed(2),
       perp_next_funding_rate: ((random() - 0.45) * 0.0003).toFixed(7),
       perp_next_funding_time_ms: Math.ceil(now / 3_600_000) * 3_600_000,
+      volume_change_24h: ((random() - 0.4) * 1.2).toFixed(4),
       updated_at_ms: now,
     });
   }

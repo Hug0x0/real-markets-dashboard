@@ -15,6 +15,14 @@ export type MarketTicker = {
   symbol: string;
   mark_price: string;
   index_price: string;
+  last_traded_price?: string | null;
+  /** Last traded price 24h ago; `price_change_24h` = last_traded_price ÷ prev_price_24h − 1. */
+  prev_price_24h?: string | null;
+  price_change_24h?: string | null;
+  high_price_24h?: string | null;
+  low_price_24h?: string | null;
+  /** Fractional change of 24h volume versus the previous 24h (0.25 = +25%). */
+  volume_change_24h?: string | null;
   open_interest?: string | null;
   open_interest_value?: string | null;
   volume_24h: string;

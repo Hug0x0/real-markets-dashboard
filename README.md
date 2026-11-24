@@ -44,7 +44,7 @@ This is the screenshot at the top of this page.
 
 <img src="docs/screenshots/screener.png" alt="Screener view" width="100%">
 
-Every market, ranked by **volume surge** (last hour versus the hourly average), 24h change, 24h volume, open interest, funding rate or 24h trade count. You can search markets and flip the sort order. Click a row to open that market in Analytics.
+Every market, ranked by **volume surge** (last hour versus the hourly average), 24h change, 24h volume, **volume Δ 24h** (versus the day before), open interest, funding rate or 24h trade count. You can search markets and flip the sort order. Click a row to open that market in Analytics.
 
 ### Analytics
 
@@ -52,7 +52,7 @@ Every market, ranked by **volume surge** (last hour versus the hourly average), 
 
 | Section | What it shows |
 | --- | --- |
-| **Ticker strip** | Mark and index price, 24h high/low, funding rate with a countdown to the next payment, volume and open interest. |
+| **Ticker strip** | Last, mark and index price, 24h high/low, funding rate with a countdown to the next payment, volume and open interest. |
 | **Trader metrics** | Active traders over 1h and 24h, split into buyers and sellers, and the long/short account ratio. |
 | **Trade flow** | Taker buy and sell notional per bar, with 1m, 5m, 15m or 1h bars over the last 1h, 6h or 24h. |
 | **Cumulative volume delta** | The running sum of taker buys minus taker sells. |
@@ -63,9 +63,9 @@ The current view and market are kept in the URL (for example `?view=analytics&ma
 
 The indexer serves ticker snapshots and raw fills, but no candles. The dashboard builds everything else in the browser:
 
-1. It fetches tickers and market metadata and shows the page as soon as they arrive (about 1 second).
+1. It fetches tickers and market metadata and shows the page as soon as they arrive (about 1 second). Tickers already carry the 24h change, high/low and volume change, so the heatmap, market flow and screener are complete at this point.
 2. It fetches **a rolling 24h of trades** in one-hour slices (`f[created_at_from_ms]` / `f[created_at_to_ms]`), 8 slices at a time, newest first. Charts fill in as history arrives, and a progress strip shows how many hours are ready.
-3. It derives all the historical numbers from those fills: price change, high/low, hourly volume share, surge, trade flow, CVD and active accounts.
+3. It derives the rest from those fills: hourly volume share, surge, trade flow, CVD and active accounts.
 4. It keeps only the fields it uses (each raw fill is about 740 bytes) and caches the dataset in **IndexedDB**. On reload, the cached data appears instantly and only the trades since the last visit are fetched.
 5. Every 5 minutes it refreshes the same way, fetching only the gap since its newest fill.
 
@@ -76,7 +76,8 @@ REAL prints roughly 80k fills a day and the indexer returns at most 1,000 per pa
 | Metric | Definition |
 | --- | --- |
 | 24h volume / open interest | Sum of ticker `turnover_24h` / `open_interest_value` (USD). |
-| 24h change | Mark price ÷ price of the oldest fill in the 24h window − 1. |
+| 24h change / high / low | Ticker `price_change_24h` (last traded price ÷ price 24h ago − 1), `high_price_24h` and `low_price_24h`. If the indexer omits them, they are derived from fills: mark price ÷ oldest fill in the window − 1, and the highest / lowest fill. |
+| Volume Δ 24h | Ticker `volume_change_24h`: 24h volume versus the previous 24h. `+50%` means half again as much volume as the day before. |
 | Volume surge | Last-hour traded notional ÷ average hourly notional over the window. `2.00×` means twice as busy as usual. |
 | Volume share | Each market's share of traded notional (`price × volume`) per hour. Markets beyond the top 4 are grouped as Other. |
 | Trade flow / CVD | Notional per bar split by taker side. CVD is the running sum of buys − sells. |

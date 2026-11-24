@@ -81,10 +81,11 @@ export function Analytics({ data, rows, marketId, onMarket, api, now }: Props) {
               </select>
             </label>
             <strong className={trendClass(row.change24h)}>
-              {price(row.price)} <small>{pct(row.change24h)}</small>
+              {price(row.lastPrice)} <small>{pct(row.change24h)}</small>
             </strong>
           </div>
         </div>
+        <Stat label="Last" value={price(row.lastPrice)} />
         <Stat label="Mark" value={price(row.price)} />
         <Stat label="Index" value={price(row.indexPrice)} />
         <Stat label="24h High" value={price(row.high24h)} />
