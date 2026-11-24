@@ -15,18 +15,18 @@ function rng(seed: number) {
 type Spec = { id: string; name: string; price: number; vol: number; weight: number; oi: number; drift: number; lateBoost?: number };
 
 const SPECS: Spec[] = [
-  { id: "btc", name: "Bitcoin", price: 91_250, vol: 0.006, weight: 30, oi: 1_240_000, drift: -0.0002 },
-  { id: "eth", name: "Ethereum", price: 3_085, vol: 0.008, weight: 18, oi: 640_000, drift: -0.0004 },
-  { id: "sol", name: "Solana", price: 141.2, vol: 0.01, weight: 9, oi: 210_000, drift: 0.0006 },
-  { id: "hype", name: "Hyperliquid", price: 38.4, vol: 0.012, weight: 8, oi: 160_000, drift: 0.0003 },
-  { id: "xrp", name: "XRP", price: 2.18, vol: 0.011, weight: 5, oi: 72_000, drift: -0.0001, lateBoost: 3 },
-  { id: "xaut", name: "Tether Gold", price: 4_065, vol: 0.003, weight: 6, oi: 98_000, drift: 0.0002 },
-  { id: "zec", name: "Zcash", price: 612, vol: 0.02, weight: 4, oi: 54_000, drift: 0.002, lateBoost: 5 },
-  { id: "doge", name: "Dogecoin", price: 0.162, vol: 0.013, weight: 3, oi: 31_000, drift: -0.0008 },
-  { id: "link", name: "Chainlink", price: 13.9, vol: 0.011, weight: 2.5, oi: 22_000, drift: 0.0004, lateBoost: 2 },
-  { id: "avax", name: "Avalanche", price: 14.6, vol: 0.012, weight: 2, oi: 18_000, drift: -0.0012 },
-  { id: "sui", name: "Sui", price: 1.71, vol: 0.014, weight: 2, oi: 15_000, drift: 0.0009 },
-  { id: "bnb", name: "BNB", price: 905, vol: 0.006, weight: 2, oi: 26_000, drift: 0 },
+  { id: "btc", name: "Bitcoin", price: 60_350, vol: 0.006, weight: 30, oi: 69_000, drift: -0.0002 },
+  { id: "eth", name: "Ethereum", price: 1_698, vol: 0.008, weight: 14, oi: 17_200, drift: -0.0004 },
+  { id: "xaut", name: "Tether Gold", price: 3_613, vol: 0.003, weight: 8, oi: 8_860, drift: 0.0002 },
+  { id: "xrp", name: "XRP", price: 0.9453, vol: 0.011, weight: 7, oi: 1_290, drift: -0.0001, lateBoost: 3 },
+  { id: "hype", name: "Hyperliquid", price: 63.95, vol: 0.012, weight: 7, oi: 1_780, drift: 0.0003 },
+  { id: "sol", name: "Solana", price: 71.5, vol: 0.01, weight: 5, oi: 9_540, drift: 0.0006 },
+  { id: "zec", name: "Zcash", price: 754.9, vol: 0.02, weight: 4, oi: 1_130, drift: 0.002, lateBoost: 5 },
+  { id: "xmr", name: "Monero", price: 498.2, vol: 0.012, weight: 4, oi: 1_200, drift: 0.0004, lateBoost: 2 },
+  { id: "bnb", name: "BNB", price: 551.1, vol: 0.006, weight: 4, oi: 2_430, drift: 0 },
+  { id: "near", name: "NEAR Protocol", price: 3.008, vol: 0.013, weight: 3.5, oi: 900, drift: -0.0008 },
+  { id: "ena", name: "Ethena", price: 0.1006, vol: 0.014, weight: 3.5, oi: 600, drift: 0.0009 },
+  { id: "lit", name: "Lighter", price: 2.418, vol: 0.016, weight: 3.5, oi: 1_110, drift: -0.0012 },
 ];
 
 const ACCOUNTS = Array.from({ length: 64 }, (_, index) => `0x${(index * 2654435761 >>> 0).toString(16).padStart(8, "0")}${"a1b2c3d4".repeat(4)}`);
