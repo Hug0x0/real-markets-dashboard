@@ -12,6 +12,7 @@ function metricText(metric: ScreenerMetric, row: MarketRow) {
     case "surge":
       return ratio(value);
     case "change":
+    case "volumeChange":
       return pct(value);
     case "funding":
       return pct(value, 4);
@@ -103,12 +104,12 @@ export function Screener({ rows, onOpen }: Props) {
                       </span>
                     </div>
                   </td>
-                  <td>{price(row.price)}</td>
+                  <td>{price(row.lastPrice)}</td>
                   <td className={`hide-sm ${trendClass(row.change24h)}`}>{pct(row.change24h)}</td>
                   <td className="hide-sm muted">{usd(row.avgHourlyVolume)}</td>
                   <td className="hide-sm">{usd(row.volume1h)}</td>
                   <td className="hide-sm">{usd(row.turnover24h)}</td>
-                  <td className={metric === "change" || metric === "funding" ? trendClass(SCREENER_METRICS[metric].value(row)) : ""}>{metricText(metric, row)}</td>
+                  <td className={metric === "change" || metric === "volumeChange" || metric === "funding" ? trendClass(SCREENER_METRICS[metric].value(row)) : ""}>{metricText(metric, row)}</td>
                 </tr>
               ))}
             </tbody>

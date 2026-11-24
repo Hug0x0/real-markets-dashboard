@@ -28,6 +28,40 @@ describe("buildMarketRows", () => {
   it("has no change without any trade", () => {
     expect(buildMarketRows([ticker("eth", "5")], [], [], NOW, NOW - 7 * DAY_MS)[0].change24h).toBeNull();
   });
+  it("falls back to the mark price and has no volume change when the ticker omits them", () => {
+    expect([row.lastPrice, row.volumeChange24h]).toEqual([110, null]);
+  });
+});
+
+describe("buildMarketRows with ticker 24h stats", () => {
+  const withStats: MarketTicker = {
+    ...ticker("btc", "110", "500", "50"),
+    last_traded_price: "109.5",
+    prev_price_24h: "120",
+    price_change_24h: "-0.0875",
+    high_price_24h: "121",
+    low_price_24h: "101",
+    volume_change_24h: "0.25",
+  };
+  const fills = [trade("btc", 104, 1, DAY_MS + 1), trade("btc", 108, 2, 1000)];
+
+  it("prefers the ticker's change, high, low and last price over values derived from fills", () => {
+    const [row] = buildMarketRows([withStats], [], fills, NOW, NOW - DAY_MS);
+    expect(row.change24h).toBeCloseTo(-0.0875);
+    expect([row.high24h, row.low24h, row.lastPrice, row.volumeChange24h]).toEqual([121, 101, 109.5, 0.25]);
+  });
+  it("knows the 24h change before any trade history has loaded", () => {
+    expect(buildMarketRows([withStats], [], [], NOW, NOW)[0].change24h).toBeCloseTo(-0.0875);
+  });
+  it("ignores empty or malformed ticker values", () => {
+    const [row] = buildMarketRows([{ ...withStats, price_change_24h: "", high_price_24h: null, low_price_24h: "n/a" }], [], fills, NOW, NOW - 2 * DAY_MS);
+    expect(row.change24h).toBeCloseTo(110 / 104 - 1);
+    expect([row.high24h, row.low24h]).toEqual([108, 108]);
+  });
+  it("ranks by volume change with unreported markets last", () => {
+    const rows = buildMarketRows([withStats, { ...withStats, market_id: "eth", volume_change_24h: "-0.4" }, ticker("sol", "1")], [], [], NOW, NOW);
+    expect(rankRows(rows, "volumeChange", "desc").map((item) => item.id)).toEqual(["btc", "eth", "sol"]);
+  });
 });
 
 describe("totals", () => {
